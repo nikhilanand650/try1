@@ -1,0 +1,42 @@
+const clientId = "2432424";
+
+var bearerToken = null;
+
+function run() {
+
+    if (bearerToken === null) {
+        let tokenRequest = createTokenRequest();
+        bearerToken = fetchToken(tokenRequest)
+    }
+
+    updateRequestHeaders(bearerToken);
+}
+
+function createTokenRequest() {
+    let username = "<username>";
+    let password = "<pwd>";
+    let grantType = "client_credentials";
+    let basicEncoded = "Basic xxxx"
+
+    let tokenRequest = httpClient.createRequest("https://<host>:<port>/oauth2/v1/token");
+    // tokenRequest.addHeader("content-type", "application/x-www-form-urlencoded");
+    // tokenRequest.setBody("grant_type=" + grantType + "&client_id=" + clientId + "&username=" + username + "&password=" + password);
+    tokenRequest.addHeader("authorization", basicEncoded);
+	tokenRequest.addHeader("grant_type", grantType);
+    tokenRequest.setMethod("POST");
+
+    return tokenRequest;
+}
+
+function fetchToken(tokenRequest) {
+    let response = tokenRequest.send();
+    let message = response.asString();
+    let parsedBearerToken = JSON.parse(message).access_token;
+
+    return parsedBearerToken;
+}
+
+function updateRequestHeaders(token) {
+    request.addHeader("authorization", "Bearer " + token);
+    // request.addHeader("client_id", clientId);
+}
